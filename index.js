@@ -23,7 +23,7 @@ async function run() {
         await client.connect();
         const database = client.db("travel-agency");
         const blogsCollection = database.collection("blogs");
-  
+
         const usersCollection = database.collection('users');
         const ordersCollection = database.collection("orders");
 
@@ -72,13 +72,13 @@ async function run() {
                 $set: {
                     title: title,
                     subtitle: subtitle,
-                    dec:dec,
-                    cost:cost,
+                    dec: dec,
+                    cost: cost,
                     Location: Location,
                     category: category,
                     rating: rating,
-                    username:username,
-                    image:imgBuffer
+                    username: username,
+                    image: imgBuffer
                 }
             };
             const result = await blogsCollection.updateOne(filter, updateDoc, options);
@@ -91,24 +91,57 @@ async function run() {
             const options = { upsert: true }
             const updateDoc = {
                 $set: {
-                    status:status              }
+                    status: status
+                }
             };
             const result = await blogsCollection.updateOne(filter, updateDoc, options);
             res.json(result);
         });
         //GET API for all the products\ showing UI
         app.get("/blogs", async (req, res) => {
-            const result = blogsCollection.find({});
-            const blogs = await result.toArray();
-            res.send(blogs);
+            const cursor = blogsCollection.find({});
+            const page = parseInt(req.query.page);
+            const size = parseInt(req.query.size);
+            let blogs;
+            const count = await cursor.count();
+            if (page) {
+                blogs = await cursor.skip(page * size).limit(10).toArray();
+            }
+            else {
+                blogs = await cursor.limit(10).toArray();
+            }
+         
+            
+            res.send({
+                count,
+                blogs
+            });
 
         })
-        app.get("/blogs/:status", async (req, res) => {
-            const result = await blogsCollection.find({
-                status: req.params.status,
-            }).toArray();
-            res.send(result);
-        });
+        // app.get("/blogs/:status", async (req, res) => {
+        //     console.log(req.query)
+        //     const page=parseInt(req.query.page)
+        //     const size=parseInt(req.query.size)
+        //     const cursor = await blogsCollection.find({
+        //         status: req.params.status,
+        //     })
+        //     let blogs;
+        //     const count=await cursor.count();
+        //     if(page){
+        //         blogs= await cursor.skip(page*size).limit(size).toArray()
+        //     }
+        //     else{
+        //         blogs = await blogsCollection.find({
+        //             status: req.params.status,
+        //         }).toArray();
+        //     }
+
+
+
+
+        //     res.send({count,blogs});
+        // });
+
         app.get("/myblogs/:email", async (req, res) => {
             const result = await blogsCollection.find({
                 useremail: req.params.email,
@@ -149,7 +182,7 @@ async function run() {
             const result = await usersCollection.updateOne(filter, updateDoc);
             res.json(result);
         });
-        
+
         app.get('/users/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email: email };
@@ -162,11 +195,11 @@ async function run() {
         })
 
         //POST API for Products order
-      
+
 
         //GET API-orders 
-   
-       
+
+
         //Delete API- delete order
         app.delete('/orders/:id', async (req, res) => {
             const deletedOrder = await ordersCollection.deleteOne({ _id: ObjectId(req.params.id) });
@@ -174,7 +207,7 @@ async function run() {
         });
 
         //Update order status api
-        
+
         app.get("/wishlist/:email", async (req, res) => {
             const result = await wishlistCollection.find({
                 user_email: req.params.email,
