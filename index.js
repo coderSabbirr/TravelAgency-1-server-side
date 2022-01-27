@@ -148,6 +148,10 @@ async function run() {
             }).toArray();
             res.send(result);
         });
+        app.get("/manageblog", async (req, res) => {
+            const result = await blogsCollection.find({}).toArray();
+            res.send(result);
+        });
         //Get API for certain product by id
         app.get("/blogsview/:id", async (req, res) => {
             const blogs = await blogsCollection.findOne({ _id: ObjectId(req.params.id) });
