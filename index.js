@@ -205,7 +205,7 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('Co-op Battle Team 09!')
+    res.send('Hacking Done')
 })
 
 app.listen(port, () => {
