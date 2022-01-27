@@ -23,9 +23,7 @@ async function run() {
         await client.connect();
         const database = client.db("travel-agency");
         const blogsCollection = database.collection("blogs");
-        const addCartCollection = database.collection("addcart");
-        const wishlistCollection = database.collection("wishlist");
-        const reviewsCollection = database.collection("reviews");
+  
         const usersCollection = database.collection('users');
         const ordersCollection = database.collection("orders");
 
@@ -111,11 +109,16 @@ async function run() {
             }).toArray();
             res.send(result);
         });
+        app.get("/myblogs/:email", async (req, res) => {
+            const result = await blogsCollection.find({
+                useremail: req.params.email,
+            }).toArray();
+            res.send(result);
+        });
         //Get API for certain product by id
-        app.get("/blogs/:id", async (req, res) => {
+        app.get("/blogsview/:id", async (req, res) => {
             const blogs = await blogsCollection.findOne({ _id: ObjectId(req.params.id) });
             res.send(blogs)
-
         });
         //Delete API- delete products
         app.delete('/blogs/:id', async (req, res) => {
